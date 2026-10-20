@@ -7,6 +7,8 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundColor(.accentColor)
             Text("Hello, world!")
+            
+            WordNodeView(word: WordNode("he", left: .angleOut, right: .angleIn))
         }
     }
 }

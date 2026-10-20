@@ -10,42 +10,38 @@ import SwiftUI
 struct WordNodeShape: Shape {
     let lCap: CapType
     let rCap: CapType
-    let height: CGFloat
-    let textWidth: CGFloat
+    let capWidth: CGFloat
     let nodePadding: CGFloat
     
     static let left = [
-        CGPoint(x: 0.75, y: 0.0),
-        CGPoint(x: 0.25, y: 0.5),
-        CGPoint(x: 0.75, y: 1.0)
+        CGPoint(x: 0.5, y: 0.0),
+        CGPoint(x: -0.5, y: 0.5),
+        CGPoint(x: 0.5, y: 1.0)
     ]
     
     static let right = [
-        CGPoint(x: 0.25, y: 0.0),
-        CGPoint(x: 0.75, y: 0.5),
-        CGPoint(x: 0.25, y: 1.0)
+        CGPoint(x: -0.5, y: 0.0),
+        CGPoint(x: 0.5, y: 0.5),
+        CGPoint(x: -0.5, y: 1.0)
     ]
     
-    init(left lCap: CapType, right rCap: CapType, height: CGFloat, textWidth: CGFloat, nodePadding: CGFloat) {
+    init(left lCap: CapType, right rCap: CapType, capWidth: CGFloat, nodePadding: CGFloat) {
         self.lCap = lCap
         self.rCap = rCap
-        self.height = height
-        self.textWidth = textWidth
+        self.capWidth = capWidth
         self.nodePadding = nodePadding
     }
     
     func path(in rect: CGRect) -> Path {
         Path { path in
-            let leftCapX: CGFloat = height + textWidth + nodePadding * 2
-            
             // Get the starting point of the shape
             let startPoint = switch lCap {
             case .angleIn:
-                CGPoint(x: height * Self.right[0].x, y: height * Self.right[0].y)
+                CGPoint(x: capWidth * Self.right[0].x, y: rect.height * Self.right[0].y)
             case .angleOut:
-                CGPoint(x: height * Self.left[0].x, y: height * Self.left[0].y)
+                CGPoint(x: capWidth * Self.left[0].x, y: rect.height * Self.left[0].y)
             case .flat:
-                CGPoint(x: height * 0.5, y: 0)
+                CGPoint(x: 0.0, y: 0.0)
             }
             path.move(to: startPoint)
             
@@ -53,29 +49,29 @@ struct WordNodeShape: Shape {
             switch lCap {
             case .angleIn:
                 for i in 1...2 {
-                    path.addLine(to: CGPoint(x: height * Self.right[i].x, y: height * Self.right[i].y))
+                    path.addLine(to: CGPoint(x: capWidth * Self.right[i].x, y: rect.height * Self.right[i].y))
                 }
             case .angleOut:
                 for i in 1...2 {
-                    path.addLine(to: CGPoint(x: height * Self.left[i].x, y: height * Self.left[i].y))
+                    path.addLine(to: CGPoint(x: capWidth * Self.left[i].x, y: rect.height * Self.left[i].y))
                 }
             case .flat:
-                path.addLine(to: CGPoint(x: height * 0.5, y: height))
+                path.addLine(to: CGPoint(x: 0.0, y: rect.height))
             }
             
             // Draw the line on the right side
             switch rCap {
             case .angleIn:
                 WordNodeShape.left.reversed().forEach { point in
-                    path.addLine(to: CGPoint(x: leftCapX + height * point.x, y: height * point.y))
+                    path.addLine(to: CGPoint(x: rect.maxX + capWidth * point.x, y: rect.height * point.y))
                 }
             case .angleOut:
                 WordNodeShape.right.reversed().forEach { point in
-                    path.addLine(to: CGPoint(x: leftCapX + height * point.x, y: height * point.y))
+                    path.addLine(to: CGPoint(x: rect.maxX + capWidth * point.x, y: rect.height * point.y))
                 }
             case .flat:
-                path.addLine(to: CGPoint(x: leftCapX + height * 0.5, y: height))
-                path.addLine(to: CGPoint(x: leftCapX + height * 0.5, y: 0.0))
+                path.addLine(to: CGPoint(x: rect.maxX, y: rect.height))
+                path.addLine(to: CGPoint(x: rect.maxX, y: 0.0))
             }
             
             // Return to the start point
